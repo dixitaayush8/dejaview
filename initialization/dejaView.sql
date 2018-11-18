@@ -12,7 +12,7 @@ CREATE TABLE MOVIE
  actors VARCHAR(800),
  director VARCHAR(50),
  duration INT,
- rating DOUBLE(1,1), 
+ rating DOUBLE(2,1), 
  releaseYear INT,
  updated_on DATE,
  CHECK (rating <= 10 and rating > 0),
@@ -95,7 +95,7 @@ CREATE TABLE ARCHIVED_MOVIES
  actors VARCHAR(800),
  director VARCHAR(50),
  duration INT,
- rating DOUBLE(1,1), 
+ rating DOUBLE(2,1), 
  releaseYear INT,
  updated_on DATE,
  CHECK (rating <= 10 and rating > 0),
@@ -136,7 +136,7 @@ BEGIN
 	UPDATE MOVIE SET rating = 
 		(select avg(rating) averageRating
 		 from Rating
-		 WHERE movieID = NEW.movieID);
+		 WHERE movieID = NEW.movieID) where movieID = NEW.movieID;
 END //
 DELIMITER ;
 

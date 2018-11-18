@@ -100,7 +100,13 @@ public class DejaView {
 			String password = scan.next();
 			try {
 				ResultSet rs = dj.login(email, password, conn);
-				System.out.println(rs);
+				if(!rs.next()) {
+					System.out.println("User does not exist");
+				}
+				else {
+					System.out.println("email: " + rs.getString("email"));
+					System.out.println("password: " + rs.getString("password"));
+				}
 			} catch (SQLException e) {
 				System.out.println("Something went wrong!");
 				e.printStackTrace();
