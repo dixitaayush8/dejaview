@@ -97,23 +97,26 @@ CREATE TABLE ARCHIVED_MOVIES
  duration INT,
  rating DOUBLE(1,1), 
  releaseYear INT,
+ updated_on DATE,
  CHECK (rating <= 10 and rating > 0),
  PRIMARY KEY (movieID)
 );
 ALTER table MOVIE AUTO_INCREMENT = 1;
 
-DROP PROCEDURE IF EXISTS acrchiveMoviesOlderThan;
+DROP PROCEDURE IF EXISTS archiveMoviesBefore;
 DELIMITER //
-CREATE PROCEDURE acrchiveMoviesOlderThan(IN someDate date) 
+CREATE PROCEDURE archiveMoviesBefore(IN thisDate date) 
 BEGIN
-SELECT *
+INSERT INTO ARCHIVED_MOVIES 
+(SELECT *
 FROM MOVIE
-WHERE someDate > updated_on;
+WHERE thisDate > updated_on);
+DELETE FROM MOVIE WHERE thisDate > updated_on;
 END //
 DELIMITER ;
 
 
-DROP TRIGGER IF EXISTS updateTickets
+DROP TRIGGER IF EXISTS updateTickets;
 DELIMITER //
 CREATE TRIGGER updateTickets
 AFTER INSERT ON TICKET
@@ -124,7 +127,7 @@ BEGIN
 END //
 DELIMITER ;
 
-DROP TRIGGER IF EXISTS updateRatings
+DROP TRIGGER IF EXISTS updateRatings;
 DELIMITER //
 CREATE TRIGGER updateRatings
 AFTER INSERT ON RATING
