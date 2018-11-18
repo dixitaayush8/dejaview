@@ -84,7 +84,7 @@ CREATE TABLE TICKET
  FOREIGN KEY (theaterID) REFERENCES Theater(theaterID) on delete cascade,
  FOREIGN KEY (cinemaID) REFERENCES Cinema(cinemaID) on delete cascade
 );
-ALTER table USER AUTO_INCREMENT = 1;
+ALTER table TICKET AUTO_INCREMENT = 1;
 
 DROP TABLE IF EXISTS ARCHIVED_MOVIES;
 CREATE TABLE ARCHIVED_MOVIES
@@ -101,7 +101,7 @@ CREATE TABLE ARCHIVED_MOVIES
  CHECK (rating <= 10 and rating > 0),
  PRIMARY KEY (movieID)
 );
-ALTER table MOVIE AUTO_INCREMENT = 1;
+ALTER table ARCHIVED_MOVIES AUTO_INCREMENT = 1;
 
 DROP PROCEDURE IF EXISTS archiveMoviesBefore;
 DELIMITER //
@@ -134,7 +134,7 @@ AFTER INSERT ON RATING
 FOR EACH ROW
 BEGIN
 	UPDATE MOVIE SET rating = 
-		(select avg(rating) averageRating
+		(select avg(ratingNumber) averageRating
 		 from Rating
 		 WHERE movieID = NEW.movieID) where movieID = NEW.movieID;
 END //
