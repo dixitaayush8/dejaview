@@ -1,1 +1,1 @@
-1	Rakesh	Konda	rakesh.konda07@gmail.com	password	False	0
+1	Rakesh	Konda	rakesh.konda@sjsu.edu	password	False	0

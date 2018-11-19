@@ -1,0 +1,284 @@
+package dejaview;
+
+import java.sql.*;
+import java.util.*;
+
+public class DejaView {
+	
+	private String userName;
+	private String password;
+	private String serverName;
+	private int portNumber;
+	private String dbName;
+	private boolean isAdmin;
+	private String userEmail;
+	private String userPassword;
+	private int userID;
+	
+	
+	public DejaView(String userName, String password, String serverName, int portNumber, String dbName) {
+		this.userName = userName;
+		this.password = password;
+		this.serverName = serverName;
+		this.portNumber = portNumber;
+		this.dbName = dbName;
+	}
+	/**
+	 * Get a new database connection
+	 * 
+	 * @return
+	 * @throws SQLException
+	 */
+	public Connection getConnection() throws SQLException {
+		Connection conn = null;
+		Properties connectionProps = new Properties();
+		connectionProps.put("user", this.userName);
+		connectionProps.put("password", this.password);
+		
+		try {
+			conn = DriverManager.getConnection("jdbc:mysql://"
+					+ this.serverName + ":" + this.portNumber + "/" + this.dbName,
+					connectionProps);
+		} catch (SQLException e) {
+			System.out.println("Connection Failed! Check output console");
+			e.printStackTrace();
+		}
+		return conn;
+	}
+	
+	public static void mainMenuPrompt() {
+		System.out.println("Main Menu");
+		System.out.println("1. Login");
+		System.out.println("2. Register");
+		System.out.println("3. Quit");
+	}
+	
+	public void mainMenu(Scanner scan) {
+		mainMenuPrompt();
+		while(!scan.hasNext("[1-3]")) {
+			System.out.println("Please choose an appropriate value");
+			mainMenuPrompt();
+			scan.next();
+		}
+	}
+	
+	public boolean isAdmin(Connection conn) throws SQLException {
+		String query = "SELECT isAdmin FROM USER WHERE email=? and password=?";
+		PreparedStatement st = conn.prepareStatement(query);
+		st.setString(1, this.userEmail);
+		st.setString(2, this.userPassword);
+		ResultSet rs = st.executeQuery();
+		rs.next();
+		if(rs.getBoolean(1) == true) {
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean login(Scanner scan, Connection conn) throws SQLException {
+		boolean success = false;
+		System.out.print("Please enter your email: ");
+		this.userEmail = scan.next();
+		System.out.print("Please enter your password: ");
+		this.userPassword = scan.next();
+		
+		String query = "SELECT * FROM USER where email=? and password=?";
+		PreparedStatement ps = conn.prepareStatement(query);
+		ps.setString(1, this.userEmail);
+		ps.setString(2, this.userPassword);
+		ResultSet rs = ps.executeQuery();
+		if(!rs.next()) {
+			System.out.println("Login Failed! Please try again");
+		}
+		else {
+			String rsEmail = rs.getString("email");
+			String rsPass = rs.getString("password");
+			if(this.userEmail.equals(rsEmail) && this.userPassword.equals(rsPass)) {
+				System.out.println("Welcome " + rs.getString("firstName") + "!");
+				this.userID = rs.getInt("userID");
+			}
+			
+			success = true;
+			
+		}
+		return success;
+	}
+	
+	public int register(Scanner scan, Connection conn) throws SQLException {
+		String query = "INSERT INTO USER VALUES(?,?,?,?,?,?,?)";
+		String tableCount = "SELECT COUNT(*) FROM USER";
+		Statement st = conn.createStatement();
+		ResultSet rs = st.executeQuery(tableCount);
+		int count = 0;
+		while(rs.next()) {
+			count = rs.getInt(1) + 1;
+		}
+		System.out.print("Please enter your First Name: ");
+		String firstName = scan.next();
+		System.out.print("Please enter your Last Name: ");
+		String lastName = scan.next();
+		System.out.print("Please enter your email address: ");
+		String email = scan.next();
+		System.out.print("Please enter your password: ");
+		String password = scan.next();
+		System.out.print("Please enter optional keyword: ");
+		String admin = scan.next();
+		
+		PreparedStatement ps = conn.prepareStatement(query);
+		ps.setInt(1, count);
+		ps.setString(2, firstName);
+		ps.setString(3, lastName);
+		ps.setString(4, email);
+		ps.setString(5, password);
+		if(admin.equals("admin")) {
+			ps.setBoolean(6, true);
+		} else {
+			ps.setBoolean(6, false);
+		}
+		ps.setInt(7, 0);
+		
+		return ps.executeUpdate();
+	}
+	
+	public void userchoices() {
+		System.out.println("0. Exit program");
+		System.out.println("1. Rate a movie");
+		System.out.println("2. Search for movie by title");
+		System.out.println("3. View your tickets");
+	}
+	
+	public void viewTickets(Scanner scan, Connection conn) throws SQLException {
+		String query = "SELECT  User.userID, User.firstName, User.lastName, User.email, Movie.movieTitle, Movie.movieID, Ticket.ticketID, Theater.startTime,Theater.endTime, Cinema.cinemaName FROM TICKET INNER JOIN USER ON User.userID=ticket.userID INNER JOIN MOVIE ON Movie.movieID = ticket.movieID INNER JOIN CINEMA ON Cinema.cinemaID=ticket.cinemaID INNER JOIN THEATER ON Theater.theaterID=ticket.theaterID AND Theater.movieID=ticket.movieID AND User.email = '?'";
+		PreparedStatement ps = conn.prepareStatement(query);
+		ps.setString(1, this.userEmail);
+		ResultSet rs = ps.executeQuery();
+		System.out.println("userID\tfirstName\tlastName\temail\tmovieTitle\tmovieID\tticketID\tstartTime\tendTime\tcinemaName");
+		while(rs.next()) {
+			System.out.println(rs.getInt(1) + "\t" + rs.getString(2) + "\t" + rs.getString(3) + "\t" + rs.getString(4) + "\t" + rs.getString(5) + "\t" + rs.getInt(6) + "\t" + rs.getTime(7) + "\t" + rs.getTime(8) + "\t" + rs.getString(9) + "\t");
+		}
+	}
+	
+	public void getMoviesByTitle(Scanner scan, Connection conn) throws SQLException {
+		String query = "select * from movie where movieTitle=?";
+		PreparedStatement ps = conn.prepareStatement(query);
+		System.out.print("Please enter the title: ");
+		String title = scan.nextLine();
+		ps.setString(1, title);
+		ResultSet rs = ps.executeQuery();
+		System.out.println("movieID\tmovieTitle\tgenre\tactors\tdirector\tduration\trating\treleaseYear\tupdated_on");
+		while(rs.next()) {
+			System.out.println(rs.getInt(1) + "\t" + rs.getString(2) + "\t" + rs.getString(3) + "\t" + rs.getString(4) + "\t" + rs.getString(5) + "\t" + rs.getInt(6) + "\t" + rs.getDouble(7) + rs.getInt(8) + "\t" + rs.getDate(9));
+		}
+	}
+	
+	public void getMovies(Connection conn) throws SQLException {
+		String query = "select movieID, movieTitle from Movie";
+		Statement st = conn.createStatement();
+		ResultSet rs = st.executeQuery(query);
+		System.out.println("MovieID\tMovie Title");
+		while(rs.next()) {
+			System.out.println(rs.getInt("movieID") + "\t" + rs.getString("movieTitle"));
+		}
+	}
+	
+	public void rateMovie(Scanner scan, Connection conn) throws SQLException {
+		String query = "INSERT INTO Rating (userID,movieID,ratingNumber) VALUES(?,?,?)";
+		getMovies(conn);
+		System.out.print("Please enter the movieID of the movie you would like to rate: ");
+		int id = scan.nextInt();
+		System.out.print("Please enter rating [1-10] you would like to give: ");
+		int rating = scan.nextInt();
+		PreparedStatement ps = conn.prepareStatement(query);
+		ps.setInt(1, this.userID);
+		ps.setInt(2, id);
+		ps.setInt(3, rating);
+		ps.executeUpdate();
+		System.out.println("Rating has been successfully added!");
+		
+	}
+	
+	public void adminChoices() {
+		System.out.println("Admin Choices");
+		System.out.println("1001. See all that have tickets");
+		System.out.println("1002. See how many reviews each user made");
+	}
+	
+	
+	public static void main(String[] args) throws SQLException {
+		DejaView dj = new DejaView("root", "password", "localhost", 3306, "DEJAVIEW");
+		Connection conn = null;
+		try {
+			conn = dj.getConnection();
+			System.out.println("Connected to database");
+		} catch (SQLException e) {
+			System.out.println("ERROR: Could not connect to the database");
+			e.printStackTrace();
+			return;
+		}
+		
+		System.out.println("Welcome to DejaView: A Movie Ticket Reservation System!");
+		Scanner scan = new Scanner(System.in);
+		dj.mainMenu(scan);
+		int choice = scan.nextInt();
+		if(choice == 1) {
+			boolean login = false;
+			while(login == false) {
+				//System.out.println("To log in please enter your email and password below");
+				try {
+					login = dj.login(scan, conn);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			boolean admin = false;
+			try {
+				admin = dj.isAdmin(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			if(admin == true) {
+				dj.adminChoices();
+			}
+			dj.userchoices();
+			int optionChoice;
+			while(scan.hasNextInt()) {
+				optionChoice = scan.nextInt();
+				if(optionChoice == 0) {
+					System.out.println("Goodbye!");
+					System.exit(0);
+				}
+				else if(optionChoice == 1)
+					dj.rateMovie(scan, conn);
+				else if(optionChoice == 2)
+					dj.getMoviesByTitle(scan, conn);
+				else if(optionChoice == 3)
+					dj.viewTickets(scan, conn);
+				else
+					System.out.println("Please enter a valid choice");
+				if(admin == true) {
+					dj.adminChoices();
+				}
+				dj.userchoices();
+			}
+		}
+		else if(choice == 2) {
+			int registration = 0;
+			try {
+				registration = dj.register(scan, conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			if(registration == 1) {
+				System.out.println("Registration successful!");
+				System.out.println("You've been automatically logged in");
+				//present choices
+			}
+		}
+		else {
+			System.out.println("Goodbye!");
+			System.exit(0);
+		}
+		
+	}
+
+}

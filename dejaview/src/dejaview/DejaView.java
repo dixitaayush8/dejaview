@@ -5,31 +5,16 @@ import java.util.*;
 
 public class DejaView {
 	
-//	
-//	/** The name of the MySQL account to use (or empty for anonymous) */
-//	private final String userName = "root";
-//
-//	/** The password for the MySQL account (or empty for anonymous) */
-//	private final String password = "password";
-//
-//	/** The name of the computer running MySQL */
-//	private final String serverName = "localhost";
-//
-//	/** The port of the MySQL server (default is 3306) */
-//	private final int portNumber = 3306;
-//
-//	/** The name of the database we are testing with (this default is installed with MySQL) */
-//	private final String dbName = "DEJAVIEW";
-//	
-//	/** The name of the table we are testing with */
-//	private final String tableName = "MOVIE";
-	
-	
 	private String userName;
 	private String password;
 	private String serverName;
 	private int portNumber;
 	private String dbName;
+	private boolean isAdmin;
+	private String userEmail;
+	private String userPassword;
+	private int userID;
+	
 	
 	public DejaView(String userName, String password, String serverName, int portNumber, String dbName) {
 		this.userName = userName;
@@ -61,17 +46,249 @@ public class DejaView {
 		return conn;
 	}
 	
-	public ResultSet login(String email, String password, Connection conn) throws SQLException {
-		String query = "SELECT email, password FROM USER where email=? and password=?";
-		PreparedStatement ps = conn.prepareStatement(query);
-		ps.setString(1, email);
-		ps.setString(2, password);
-		ResultSet rs = ps.executeQuery();
-		
-		return rs;
+	public static void mainMenuPrompt() {
+		System.out.println("Main Menu");
+		System.out.println("1. Login");
+		System.out.println("2. Register");
+		System.out.println("3. Quit");
+		System.out.print("Enter choice: ");
 	}
 	
-	public static void main(String[] args) {
+	public void isAdmin(Connection conn) throws SQLException {
+		String query = "SELECT isAdmin FROM USER WHERE email=? and password=?";
+		PreparedStatement st = conn.prepareStatement(query);
+		st.setString(1, this.userEmail);
+		st.setString(2, this.userPassword);
+		ResultSet rs = st.executeQuery();
+		rs.next();
+		if(rs.getBoolean(1) == true) {
+			this.isAdmin = true;
+		}
+		else {
+			this.isAdmin = false;
+		}
+	}
+	
+	public boolean login(Scanner scan, Connection conn) throws SQLException {
+		boolean success = false;
+		System.out.print("Please enter your email: ");
+		this.userEmail = scan.next();
+		System.out.print("Please enter your password: ");
+		this.userPassword = scan.next();
+		
+		String query = "SELECT * FROM USER where email=? and password=?";
+		PreparedStatement ps = conn.prepareStatement(query);
+		ps.setString(1, this.userEmail);
+		ps.setString(2, this.userPassword);
+		ResultSet rs = ps.executeQuery();
+		if(!rs.next()) {
+			System.out.println("Login Failed! Please try again");
+		}
+		else {
+			String rsEmail = rs.getString("email");
+			String rsPass = rs.getString("password");
+			if(this.userEmail.equals(rsEmail) && this.userPassword.equals(rsPass)) {
+				System.out.print("\nWelcome " + rs.getString("firstName") + "!");
+				isAdmin(conn);
+				if(this.isAdmin == true) {
+					System.out.println(" You have admin privileges");
+				}
+				this.userID = rs.getInt("userID");
+			}
+			
+			success = true;
+			
+		}
+		return success;
+	}
+	
+	public int register(Scanner scan, Connection conn) throws SQLException {
+		String query = "INSERT INTO USER VALUES(?,?,?,?,?,?,?)";
+		String tableCount = "SELECT COUNT(*) FROM USER";
+		Statement st = conn.createStatement();
+		ResultSet rs = st.executeQuery(tableCount);
+		int count = 0;
+		while(rs.next()) {
+			count = rs.getInt(1) + 1;
+		}
+		System.out.print("Please enter your First Name: ");
+		String firstName = scan.next();
+		System.out.print("Please enter your Last Name: ");
+		String lastName = scan.next();
+		System.out.print("Please enter your email address: ");
+		String email = scan.next();
+		System.out.print("Please enter your password: ");
+		String password = scan.next();
+		System.out.print("Please enter optional keyword: ");
+		String admin = scan.next();
+		
+		PreparedStatement ps = conn.prepareStatement(query);
+		ps.setInt(1, count);
+		ps.setString(2, firstName);
+		ps.setString(3, lastName);
+		ps.setString(4, email);
+		ps.setString(5, password);
+		if(admin.equals("admin")) {
+			ps.setBoolean(6, true);
+		} else {
+			ps.setBoolean(6, false);
+		}
+		ps.setInt(7, 0);
+		
+		return ps.executeUpdate();
+	}
+	
+	public void userchoices() {
+		System.out.println("");
+		System.out.println("User Operations");
+		System.out.println("0. Exit program");
+		System.out.println("1. Rate a movie");
+		System.out.println("2. Search for movie by title");
+		System.out.println("3. View your tickets");
+		System.out.println("More operations are coming soon!");
+		System.out.println("");
+
+		System.out.print("Select an operation: ");
+	}
+	
+	public void viewUsersTickets(Scanner scan, Connection conn) throws SQLException {
+		String query = "SELECT  User.userID, User.firstName, User.lastName, User.email, User.numTickets, Movie.movieTitle, Movie.movieID, Ticket.ticketID, Theater.startTime,Theater.endTime, Cinema.cinemaName FROM TICKET INNER JOIN USER ON User.userID=ticket.userID INNER JOIN MOVIE ON Movie.movieID = ticket.movieID INNER JOIN CINEMA ON Cinema.cinemaID=ticket.cinemaID INNER JOIN THEATER ON Theater.theaterID=ticket.theaterID AND Theater.movieID=ticket.movieID";
+		Statement st = conn.createStatement();
+		ResultSet rs = st.executeQuery(query);
+		System.out.println("All tickets held by users");
+		while(rs.next()) {
+			System.out.println("");
+			System.out.println("UserID: " + rs.getInt(1));
+			System.out.println("First Name: " + rs.getString(2));
+			System.out.println("Last Name: " + rs.getString(3));
+			System.out.println("Email: " + rs.getString(4));
+			System.out.println("Number of Tickets: " + rs.getInt(5));
+			System.out.println("Movie Title: " + rs.getString(6));
+			System.out.println("MovieID: " + rs.getInt(7));
+			System.out.println("TicketID: " + rs.getInt(8));
+			System.out.println("Start Time: " + rs.getTime(9));
+			System.out.println("End Time: " + rs.getTime(10));
+			System.out.println("Cinema Name: " + rs.getString(11));
+		}
+	}
+	
+	public void viewTickets(Scanner scan, Connection conn) throws SQLException {
+		String query = "SELECT  User.userID, User.firstName, User.lastName, User.email, Movie.movieTitle, Movie.movieID, Ticket.ticketID, Theater.startTime,Theater.endTime, Cinema.cinemaName FROM TICKET INNER JOIN USER ON User.userID=ticket.userID INNER JOIN MOVIE ON Movie.movieID = ticket.movieID INNER JOIN CINEMA ON Cinema.cinemaID=ticket.cinemaID INNER JOIN THEATER ON Theater.theaterID=ticket.theaterID AND Theater.movieID=ticket.movieID AND User.email=?";
+		PreparedStatement ps = conn.prepareStatement(query);
+		ps.setString(1, this.userEmail);
+		ResultSet rs = ps.executeQuery();
+		System.out.println("");
+		System.out.println("You ticket(s)");
+		System.out.println("userID\tfirstName\tlastName\temail\tmovieTitle\tmovieID\tticketID\tstartTime\tendTime\tcinemaName");
+		int count = 0;
+		while(rs.next()) {
+			count++;
+			System.out.println(rs.getInt(1) + "\t" + rs.getString(2) + "\t" + rs.getString(3) + "\t" + rs.getString(4) + "\t" + rs.getString(5) + "\t" + rs.getInt(6) + "\t" + rs.getInt(7) + "\t" +rs.getTime(8) + "\t" + rs.getTime(9) + "\t" + rs.getString(10) + "\t");
+		}
+		System.out.println("You have a total of " + count + " ticket(s)");
+	}
+	
+	public void getMoviesByTitle(Scanner scan, Connection conn) throws SQLException {
+		String query = "select * from movie where movieTitle=?";
+		PreparedStatement ps = conn.prepareStatement(query);
+		System.out.print("Please enter the title: ");
+		String title = scan.nextLine();
+		ps.setString(1, title);
+		ResultSet rs = ps.executeQuery();
+		int count = 0;
+		while(rs.next()) {
+			count++;
+			System.out.println("\n" + "movieID: " + rs.getInt(1) + "\n" + "movieTitle: " + rs.getString(2) + "\n" + "genre: " + rs.getString(3) + "\n" + "actors: " + rs.getString(4) + "\n" + "director: " + rs.getString(5) + "\n" + "duration: " + rs.getInt(6) + " minutes" + "\n" + "rating: " + rs.getDouble(7) +"/10"+ "\n" + "releaseYear: " +rs.getInt(8));
+		}
+		if(count == 0) {
+			System.out.println("Sorry that movie doesn't exist");
+		}
+	}
+	
+	public void getMovies(Connection conn) throws SQLException {
+		String query = "select movieID, movieTitle from Movie";
+		Statement st = conn.createStatement();
+		ResultSet rs = st.executeQuery(query);
+		System.out.println("Here are the available movies\n");
+		System.out.println("MovieID\t\tMovie Title");
+		while(rs.next()) {
+			System.out.println(rs.getInt("movieID") + "\t" + rs.getString("movieTitle"));
+		}
+		System.out.println("");
+	}
+	
+	public void rateMovie(Scanner scan, Connection conn) throws SQLException {
+		String query = "INSERT INTO Rating (userID,movieID,ratingNumber) VALUES(?,?,?)";
+		getMovies(conn);
+		System.out.print("Please enter the movieID of the movie you would like to rate: ");
+		int id = scan.nextInt();
+		System.out.print("Please enter rating [1-10] you would like to give: ");
+		int rating = scan.nextInt();
+		PreparedStatement ps = conn.prepareStatement(query);
+		ps.setInt(1, this.userID);
+		ps.setInt(2, id);
+		ps.setInt(3, rating);
+		ps.executeUpdate();
+		System.out.println("Rating has been successfully added!");
+		
+	}
+	
+	public void adminChoices() {
+		System.out.println("");
+		System.out.println("Admin Operations");
+		System.out.println("1001. See all users that have tickets");
+		System.out.println("1002. Add a new movie to a theater");
+		System.out.println("1003. Delete a movie");
+		System.out.println("More operations are coming soon!");
+	}
+	
+	public void deleteMovie(Scanner scan, Connection conn) throws SQLException {
+		String query = "Delete from Movie where movieTitle=?";
+		PreparedStatement ps = conn.prepareStatement(query);
+		getMovies(conn);
+		System.out.print("Enter the title of the movie you would like to delete: ");
+		String title = scan.nextLine();
+		ps.setString(1, title);
+		int result = ps.executeUpdate();
+		if(result == 1) {
+			System.out.println("Successfully deleted " + title);
+		}
+		else {
+			System.out.println("Something went wrong");
+		}
+		
+	}
+	
+	public void addNewMovieToTheater(Scanner scan, Connection conn) throws SQLException {
+		String query = "INSERT INTO theater VALUES(?, ?, ?, ?, ?)";
+		PreparedStatement ps = conn.prepareStatement(query);
+		System.out.println("Enter the theaterID: ");
+		int theaterID = scan.nextInt();
+		ps.setInt(1, theaterID);
+		System.out.println("Enter the cinemaID: ");
+		int cinemaID = scan.nextInt();
+		ps.setInt(2, cinemaID);
+		System.out.println("Enter the movieID: ");
+		int movieID = scan.nextInt();
+		ps.setInt(3, movieID);
+		System.out.println("Enter the start time[hh:mm:ss]: ");
+		String st = scan.next();
+		System.out.println("Enter the end time[hh:mm:ss]: ");
+		String et = scan.next();
+		Time start = Time.valueOf(st);
+		Time end = Time.valueOf(et);
+		ps.setTime(4, start);
+		ps.setTime(5, end);
+		int result = ps.executeUpdate();
+		if(result == 1) {
+			System.out.println("Successfully added Movie to Theater");
+		}
+		else {
+			System.out.println("Unable to add movie to Theater");
+		}
+	}
+	
+	public static void main(String[] args) throws SQLException {
 		DejaView dj = new DejaView("root", "password", "localhost", 3306, "DEJAVIEW");
 		Connection conn = null;
 		try {
@@ -82,37 +299,67 @@ public class DejaView {
 			e.printStackTrace();
 			return;
 		}
-		System.out.println("Welcome to DejaView: A Movie Ticket Reservation System!");
-
 		
+		System.out.println("Welcome to DejaView: A Movie Ticket Reservation System!");
 		Scanner scan = new Scanner(System.in);
-		System.out.println("Do you have an account? [y/n]");
-		boolean success = false;
-		while(!scan.hasNext("[yn]")) {
-			System.out.println("Please enter [y] for yes or [n] for no");
-			scan.next();
-		}
-		String choice = scan.next();
-		if(choice.equals("y")) {
-			System.out.print("Please enter your email: ");
-			String email = scan.next();
-			System.out.print("Please enter your password: ");
-			String password = scan.next();
-			try {
-				ResultSet rs = dj.login(email, password, conn);
-				if(!rs.next()) {
-					System.out.println("User does not exist");
+		mainMenuPrompt();
+		while(scan.hasNextInt()) {
+			int choice = scan.nextInt();
+			scan.nextLine(); //consume \n
+			if(choice == 1) {
+				boolean login = false;
+				while(login == false) {
+					login = dj.login(scan, conn);
+				}
+				if(dj.isAdmin == true) {
+					dj.adminChoices();
+				}
+				dj.userchoices();
+				int optionChoice;
+				while(scan.hasNextInt()) {
+					optionChoice = scan.nextInt();
+					scan.nextLine();
+					if(optionChoice == 0) {
+						System.out.println("Goodbye!");
+						System.exit(0);
+					}
+					else if(optionChoice == 1)
+						dj.rateMovie(scan, conn);
+					else if(optionChoice == 2)
+						dj.getMoviesByTitle(scan, conn);
+					else if(optionChoice == 3)
+						dj.viewTickets(scan, conn);
+					else if(optionChoice == 1001)
+						dj.viewUsersTickets(scan, conn);
+					else if(optionChoice == 1002)
+						dj.addNewMovieToTheater(scan, conn);
+					else if(optionChoice == 1003)
+						dj.deleteMovie(scan, conn);
+					else
+						System.out.println("Please enter a valid choice");
+					if(dj.isAdmin == true) {
+						dj.adminChoices();
+					}
+					dj.userchoices();
+				}
+			}
+			else if(choice == 2) { // register
+				int register = dj.register(scan, conn);
+				if(register == 1) {
+					System.out.println("Successfully Registered! Please log in");
 				}
 				else {
-					System.out.println("email: " + rs.getString("email"));
-					System.out.println("password: " + rs.getString("password"));
+					System.out.println("Could not register. Please log in");
 				}
-			} catch (SQLException e) {
-				System.out.println("Something went wrong!");
-				e.printStackTrace();
 			}
-		} else {
-			System.out.println("Registration still in progress..");
+			else if(choice == 3){
+				System.out.println("Goodbye!");
+				System.exit(0);
+			}
+			else {
+				System.out.println("Please enter an appropriate value");
+			}
+			mainMenuPrompt();
 		}
 		
 	}

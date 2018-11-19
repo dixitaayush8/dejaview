@@ -59,16 +59,15 @@ ALTER table CINEMA AUTO_INCREMENT = 1;
 DROP TABLE IF EXISTS THEATER;
 CREATE TABLE THEATER
 (
- theaterID INT AUTO_INCREMENT,
+ theaterID INT,
  cinemaID INT,
  movieID INT,
  startTime TIME,
  endTime TIME,
  CHECK (endTime > startTime),
- PRIMARY KEY (theaterID),
+ PRIMARY KEY (theaterID, movieID),
  FOREIGN KEY (cinemaID) REFERENCES Cinema(cinemaID) on delete cascade
 );
-ALTER table THEATER AUTO_INCREMENT = 1;
 
 DROP TABLE IF EXISTS TICKET;
 CREATE TABLE TICKET
@@ -81,7 +80,7 @@ CREATE TABLE TICKET
  PRIMARY KEY (ticketID),
  FOREIGN KEY (userID) REFERENCES User(userID) on delete cascade,
  FOREIGN KEY (movieID) REFERENCES Movie(movieID) on delete cascade,
- FOREIGN KEY (theaterID) REFERENCES Theater(theaterID) on delete cascade,
+ FOREIGN KEY (theaterID, movieID) REFERENCES Theater(theaterID, movieID) on delete cascade,
  FOREIGN KEY (cinemaID) REFERENCES Cinema(cinemaID) on delete cascade
 );
 ALTER table TICKET AUTO_INCREMENT = 1;
