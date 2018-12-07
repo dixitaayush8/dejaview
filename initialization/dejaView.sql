@@ -64,6 +64,7 @@ CREATE TABLE THEATER
  movieID INT,
  startTime TIME,
  endTime TIME,
+ tickets INT,
  CHECK (endTime > startTime),
  PRIMARY KEY (theaterID, movieID),
  FOREIGN KEY (cinemaID) REFERENCES Cinema(cinemaID) on delete cascade
@@ -121,10 +122,11 @@ CREATE TRIGGER updateTickets
 AFTER INSERT ON TICKET
 FOR EACH ROW
 BEGIN
-	UPDATE USER SET numTickets = numTickets + 1 
-	WHERE  userID = NEW.userID;
+	UPDATE USER SET numTickets = numTickets + 1 WHERE  userID = NEW.userID;
+	UPDATE THEATER SET tickets = tickets - 1 WHERE theaterID = NEW.theaterID AND movieID = NEW.movieID;
 END //
 DELIMITER ;
+
 
 DROP TRIGGER IF EXISTS updateRatings;
 DELIMITER //
