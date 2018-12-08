@@ -9,9 +9,9 @@ INDEX VERSION 1.131+/Users/rakeshkonda/Documents/CS157A/dejaview/.metadata/.plug
 88183214.index
 1271342938.index
 3840578188.index
-3277980169.index
-2789758058.index
 1528145264.index
+2789758058.index
+3277980169.index
 3619427458.index
 1699738662.index
 853707784.index

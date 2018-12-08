@@ -1,0 +1,103 @@
+package dejaview;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Scanner;
+import dejaview.DejaView;
+
+public class DejaViewConsole {
+	
+	public static void mainMenuPrompt() {
+		System.out.println("Main Menu");
+		System.out.println("1. Login");
+		System.out.println("2. Register");
+		System.out.println("3. Quit");
+		System.out.print("Enter choice: ");
+	}
+	
+	
+	public static void main(String[] args) throws SQLException {
+		DejaView dj = new DejaView("root", "password", "localhost", 3306, "DEJAVIEW");
+		Connection conn = null;
+		try {
+			conn = dj.getConnection();
+			System.out.println("Connected to database");
+		} catch (SQLException e) {
+			System.out.println("ERROR: Could not connect to the database");
+			e.printStackTrace();
+			return;
+		}
+		
+		System.out.println("Welcome to DejaView: A Movie Ticket Reservation System!");
+		Scanner scan = new Scanner(System.in);
+		mainMenuPrompt();
+		while(scan.hasNextInt()) {
+			int choice = scan.nextInt();
+			scan.nextLine(); //consume \n
+			if(choice == 1) {
+				boolean login = true;
+				while(login == false) {
+					login = dj.login(scan, conn);
+				}
+				if(dj.getIsAdmin() == true) {
+					dj.adminChoices();
+				}
+				dj.userchoices();
+				int optionChoice;
+				while(scan.hasNextInt()) {
+					optionChoice = scan.nextInt();
+					scan.nextLine();
+					if(optionChoice == 0) {
+						System.out.println("Goodbye!");
+						System.exit(0);
+					}
+					// ADD THE NEW METHOD IN HERE
+					else if(optionChoice == 1)
+						dj.rateMovie(scan, conn);
+					else if(optionChoice == 2)
+						dj.getMoviesByTitle(scan, conn);
+					else if(optionChoice == 3)
+						dj.viewTickets(scan, conn);
+					else if(optionChoice == 16)
+						dj.getMoviesByGenre(scan, conn);
+					else if(optionChoice == 17)
+						dj.getMoviesByDirector(scan, conn);
+					else if(optionChoice == 18)
+						dj.getMoviesByRating(scan, conn);
+					else if(optionChoice == 19)
+						dj.getMoviesByReleaseYear(scan, conn);
+					else if(optionChoice == 1001)
+						dj.viewUsersTickets(scan, conn);
+					else if(optionChoice == 1002)
+						dj.addNewMovieToTheater(scan, conn);
+					else if(optionChoice == 1003)
+						dj.deleteMovie(scan, conn);
+					else
+						System.out.println("Please enter a valid choice");
+					if(dj.getIsAdmin() == true) {
+						dj.adminChoices();
+					}
+					dj.userchoices();
+				}
+			}
+			else if(choice == 2) { // register
+				int register = dj.register(scan, conn);
+				if(register == 1) {
+					System.out.println("Successfully Registered! Please log in");
+				}
+				else {
+					System.out.println("Could not register. Please log in");
+				}
+			}
+			else if(choice == 3){
+				System.out.println("Goodbye!");
+				System.exit(0);
+			}
+			else {
+				System.out.println("Please enter an appropriate value");
+			}
+			mainMenuPrompt();
+		}
+		
+	}
+}
