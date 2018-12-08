@@ -859,7 +859,7 @@ public class DejaView {
 	}
 
 	public static void main(String[] args) throws SQLException {		
-		DejaView dj = new DejaView("a", "lilwayne123", "localhost", 3306, "DEJAVIEW");	
+		DejaView dj = new DejaView("user", "password", "localhost", 3306, "DEJAVIEW");	
 		Connection conn = null;	
 		try {	
 			conn = dj.getConnection();	
