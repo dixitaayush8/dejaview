@@ -220,13 +220,13 @@ public class DejaView {
 	}
 
 	public void seeCinemasWithAboveAverageMovies(Connection conn) throws SQLException {
-		String query = "SELECT Cinema.cinemaName, Theater.theaterID, Movie.movieTitle, Movie.rating, Theater.startTime, Theater.endTime FROM Cinema LEFT OUTER JOIN Theater USING (cinemaID) LEFT OUTER JOIN Movie USING (movieID) WHERE Movie.rating > (select avg(rating) FROM Movie)";
+		String query = "SELECT Cinema.cinemaName, Theater.theaterID, Movie.movieTitle, Movie.rating, Theater.startTime, Theater.endTime, Theater.tickets FROM Cinema LEFT OUTER JOIN Theater USING (cinemaID) LEFT OUTER JOIN Movie USING (movieID) WHERE Movie.rating > (select avg(rating) FROM Movie)";
 		Statement st = conn.createStatement();
 		ResultSet rs = st.executeQuery(query);
 		while (rs.next()) {
 			System.out.println("\n" + "Cinema: " + rs.getString("cinemaName") + "\n" + "Theater ID: "
-					+ rs.getInt("theaterID") + "\n" + "Movie Title: " + rs.getString("movieTitle") + "\n"
-					+ "Start Time: " + rs.getTime("startTime") + "\n" + "End Time: " + rs.getTime("endTime"));
+					+ rs.getInt("theaterID") + "\n" + "Movie Title: " + rs.getString("movieTitle") +  "\n" + "Movie Rating: " + rs.getInt("rating") + "\n"
+					+ "Start Time: " + rs.getTime("startTime") + "\n" + "End Time: " + rs.getTime("endTime") + "\n" + "Tickets: " + rs.getInt("tickets"));
 		}
 	}
 
@@ -859,7 +859,7 @@ public class DejaView {
 	}
 
 	public static void main(String[] args) throws SQLException {		
-		DejaView dj = new DejaView("user", "password", "localhost", 3306, "DEJAVIEW");	
+		DejaView dj = new DejaView("a", "lilwayne123", "localhost", 3306, "DEJAVIEW");	
 		Connection conn = null;	
 		try {	
 			conn = dj.getConnection();	
