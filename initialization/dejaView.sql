@@ -12,7 +12,7 @@ CREATE TABLE MOVIE
  actors VARCHAR(800),
  director VARCHAR(50),
  duration INT,
- rating DOUBLE(2,1), 
+ rating DOUBLE(4,1), 
  releaseYear INT,
  updated_on DATE,
  CHECK (rating <= 10 and rating > 0),
