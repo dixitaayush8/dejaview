@@ -351,6 +351,7 @@ public class DejaView {
 		stThree.setInt(4, theaterID);
 		stThree.executeUpdate();
 		System.out.println("Ticket for " + movieTitle + " at " + cinemaName + " has been successfully added!");
+		viewTickets(scan,conn);
 
 	}
 
@@ -944,7 +945,7 @@ public class DejaView {
 	}
 
 	public static void main(String[] args) throws SQLException {
-		DejaView dj = new DejaView("user", "password", "localhost", 3306, "DEJAVIEW");
+		DejaView dj = new DejaView("a", "lilwayne123", "localhost", 3306, "DEJAVIEW");
 		Connection conn = null;
 		try {
 			conn = dj.getConnection();
