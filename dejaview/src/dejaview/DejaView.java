@@ -351,6 +351,7 @@ public class DejaView {
 		stThree.setInt(4, theaterID);
 		stThree.executeUpdate();
 		System.out.println("Ticket for " + movieTitle + " at " + cinemaName + " has been successfully added!");
+		viewTickets(scan,conn);
 
 	}
 
