@@ -548,7 +548,6 @@ public class DejaView {
 		}
 	}
 
-
 	public void getStartEndTimeForAllMovies(Scanner scan, Connection conn) throws SQLException {
 		String query = "SELECT Movie.movieTitle, Theater.theaterID, Theater.startTime, Theater.endTime FROM Movie LEFT OUTER JOIN Theater USING (movieID)";
 		Statement ps = conn.createStatement();
@@ -628,7 +627,6 @@ public class DejaView {
 
 	// ADMIN CHOICES AND METHODS
 
-	
 	public void adminChoices() {
 		System.out.println("");
 		System.out.println("Admin Operations");
@@ -644,7 +642,7 @@ public class DejaView {
 		System.out.println("1009. Remove a theater.");
 		System.out.println("1010. Update a movie attribute.");
 	}
-	
+
 	public void archiveMoviesByDate(Scanner scan, Connection conn) throws SQLException {
 		String query = "call archiveMoviesBefore(?)";
 		PreparedStatement ps = conn.prepareStatement(query);
@@ -652,16 +650,17 @@ public class DejaView {
 		String date = scan.nextLine();
 		ps.setString(1, date);
 		ResultSet rs = ps.executeQuery();
-		System.out.println("Success, updated Movie database:");
-		String query_two = "SELECT * FROM MOVIE";
+		System.out.println("Success, here is a list of all of the movies archived before " + date + ":");
+		String query_two = "SELECT * FROM ARCHIVED_MOVIES";
 		Statement sTwo = conn.createStatement();
 		ResultSet rsTwo = sTwo.executeQuery(query_two);
 		while (rsTwo.next())
 			System.out.println("\n" + "movieID: " + rsTwo.getInt("movieID") + "\n" + "movieTitle: "
 					+ rsTwo.getString("movieTitle") + "\n" + "genre: " + rsTwo.getString("genre") + "\n" + "actors: "
-					+ rsTwo.getString("actors") + "\n" + "director: " + rsTwo.getString("director") + "\n" + "duration: "
-					+ rsTwo.getInt("duration") + "\n" + "rating: " + rsTwo.getDouble("rating") + "\n" + "releaseYear: "
-					+ rsTwo.getInt("releaseYear") + "\n" + "updated on: " + rsTwo.getDate("updated_on"));
+					+ rsTwo.getString("actors") + "\n" + "director: " + rsTwo.getString("director") + "\n"
+					+ "duration: " + rsTwo.getInt("duration") + "\n" + "rating: " + rsTwo.getDouble("rating") + "\n"
+					+ "releaseYear: " + rsTwo.getInt("releaseYear") + "\n" + "updated on: "
+					+ rsTwo.getDate("updated_on"));
 	}
 
 	public void adminSeeReviews(Scanner scan, Connection conn) throws SQLException {
@@ -719,8 +718,8 @@ public class DejaView {
 		ResultSet rs = st.executeQuery(query);
 		System.out.println("Here are the number of tickets that have been sold for each movie.");
 		while (rs.next()) {
-			System.out.println(
-					"Number of tickets: " + rs.getInt("COUNT(ticketID)") + "\nmovieTitle: " + rs.getString("movieTitle") + "\n");
+			System.out.println("Number of tickets: " + rs.getInt("COUNT(ticketID)") + "\nmovieTitle: "
+					+ rs.getString("movieTitle") + "\n");
 		}
 	}
 
@@ -810,9 +809,10 @@ public class DejaView {
 			ResultSet rsThree = sThree.executeQuery(query_one);
 			while (rsThree.next())
 				System.out.println("\n" + "Theater ID: " + rsThree.getInt("theaterID") + "\n" + "Cinema ID: "
-						+ rsThree.getInt("cinemaID") + "\n" + "Movie ID: " + rsThree.getInt("movieID") + "\n" + "Cinema ID: "
-						+ rsThree.getInt("cinemaID") + "\n" + "Start Time: " + rsThree.getTime("startTime") + "\n"
-						+ "End Time: " + rsThree.getTime("endTime") + "\n" + "Tickets: " + rsThree.getInt("tickets"));
+						+ rsThree.getInt("cinemaID") + "\n" + "Movie ID: " + rsThree.getInt("movieID") + "\n"
+						+ "Cinema ID: " + rsThree.getInt("cinemaID") + "\n" + "Start Time: "
+						+ rsThree.getTime("startTime") + "\n" + "End Time: " + rsThree.getTime("endTime") + "\n"
+						+ "Tickets: " + rsThree.getInt("tickets"));
 		} else {
 			System.out.println("Something went wrong");
 		}
@@ -826,9 +826,9 @@ public class DejaView {
 		while (rsTwo.next())
 			System.out.println("\n" + "movieID: " + rsTwo.getInt("movieID") + "\n" + "movieTitle: "
 					+ rsTwo.getString("movieTitle") + "\n" + "genre: " + rsTwo.getString("genre") + "\n" + "actors: "
-					+ rsTwo.getString("actors") + "\n" + "director: " + rsTwo.getString("director") + "\n" + "duration: "
-					+ rsTwo.getInt("duration") + "\n" + "rating: " + rsTwo.getDouble("rating") + "\n" + "releaseYear: "
-					+ rsTwo.getInt("releaseYear"));
+					+ rsTwo.getString("actors") + "\n" + "director: " + rsTwo.getString("director") + "\n"
+					+ "duration: " + rsTwo.getInt("duration") + "\n" + "rating: " + rsTwo.getDouble("rating") + "\n"
+					+ "releaseYear: " + rsTwo.getInt("releaseYear"));
 		System.out.println("Enter the movie ID for the movie to update: ");
 		int ID = scan.nextInt();
 		scan.nextLine();
@@ -864,11 +864,11 @@ public class DejaView {
 			ResultSet rsThree = sThree.executeQuery(query_three);
 			while (rsThree.next())
 				System.out.println("\n" + "movieID: " + rsThree.getInt("movieID") + "\n" + "movieTitle: "
-						+ rsThree.getString("movieTitle") + "\n" + "genre: " + rsThree.getString("genre") + "\n" + "actors: "
-						+ rsThree.getString("actors") + "\n" + "director: " + rsThree.getString("director") + "\n" + "duration: "
-						+ rsThree.getInt("duration") + "\n" + "rating: " + rsThree.getDouble("rating") + "\n" + "releaseYear: "
-						+ rsThree.getInt("releaseYear"));
-			
+						+ rsThree.getString("movieTitle") + "\n" + "genre: " + rsThree.getString("genre") + "\n"
+						+ "actors: " + rsThree.getString("actors") + "\n" + "director: " + rsThree.getString("director")
+						+ "\n" + "duration: " + rsThree.getInt("duration") + "\n" + "rating: "
+						+ rsThree.getDouble("rating") + "\n" + "releaseYear: " + rsThree.getInt("releaseYear"));
+
 		} else {
 			System.out.println("Something went wrong");
 		}
