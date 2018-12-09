@@ -1042,8 +1042,6 @@ public class DejaView {
 						dj.adminRemoveTheater(scan, conn);
 					else if (optionChoice == 1010)
 						dj.adminUpdateMovie(scan, conn);
-					else if (optionChoice == 1000)
-						dj.archiveMoviesByDate(scan, conn);
 					else
 						System.out.println("Please enter a valid choice");
 					if (dj.isAdmin == true) {
