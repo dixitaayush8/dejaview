@@ -149,16 +149,16 @@ public class DejaView {
 		System.out.println("9: Filter movies based on two actors");
 		System.out.println("10: See what other users have reviewed");
 		System.out.println("11: See movies that have greater than a set number of reviews");
-		System.out.println("13. Search movies by genre where ratings are higher than average ratings");
-		System.out.println("16. Search movie by genre");
-		System.out.println("17. Search movie by director");
-		System.out.println("18. Search movie by rating number");
-		System.out.println("19. Search movie by release year");
-		System.out.println("20. Search movies playing in a cinema");
-		System.out.println("21. See all movie reviews for a movie");
-		System.out.println("22. Check start-time and end-time for a movie");
-		System.out.println("23. Check start-time and end-time for ALL movies");
-		System.out.println("24. Buy ticket");
+		System.out.println("12. Search movies by genre where ratings are higher than average ratings");
+		System.out.println("13. Search movie by genre");
+		System.out.println("14. Search movie by director");
+		System.out.println("15. Search movie by rating number");
+		System.out.println("16. Search movie by release year");
+		System.out.println("17. Search movies playing in a cinema");
+		System.out.println("18. See all movie reviews for a movie");
+		System.out.println("19. Check start-time and end-time for a movie");
+		System.out.println("20. Check start-time and end-time for ALL movies");
+		System.out.println("21. Buy ticket");
 		System.out.println("--------------- User Operations ---------------");
 		System.out.println("");
 
@@ -999,25 +999,25 @@ public class DejaView {
 						dj.seeOtherUsersReviews(scan, conn);
 					else if (optionChoice == 11)
 						dj.findMoviesGreaterThanUserThreshold(scan, conn);
-					else if (optionChoice == 13)
+					else if (optionChoice == 12)
 						dj.getMoviesHigherThanAverageByGenre(scan, conn);
-					else if (optionChoice == 16)
+					else if (optionChoice == 13)
 						dj.getMoviesByGenre(scan, conn);
-					else if (optionChoice == 17)
+					else if (optionChoice == 14)
 						dj.getMoviesByDirector(scan, conn);
-					else if (optionChoice == 18)
+					else if (optionChoice == 15)
 						dj.getMoviesByRating(scan, conn);
-					else if (optionChoice == 19)
+					else if (optionChoice == 16)
 						dj.getMoviesByReleaseYear(scan, conn);
-					else if (optionChoice == 20)
+					else if (optionChoice == 17)
 						dj.getMoviesByCinemaName(scan, conn);
-					else if (optionChoice == 21)
+					else if (optionChoice == 18)
 						dj.getReviewsOfMovieByUsers(scan, conn);
-					else if (optionChoice == 22)
+					else if (optionChoice == 19)
 						dj.getStartEndTimeForMovie(scan, conn);
-					else if (optionChoice == 23)
+					else if (optionChoice == 20)
 						dj.getStartEndTimeForAllMovies(scan, conn);
-					else if (optionChoice == 24)
+					else if (optionChoice == 21)
 						dj.buyTicket(scan, conn);
 					else if (optionChoice == 1001)
 						dj.viewUsersTickets(scan, conn);
