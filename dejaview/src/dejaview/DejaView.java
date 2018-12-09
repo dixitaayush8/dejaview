@@ -717,10 +717,10 @@ public class DejaView {
 				+ "Ticket.movieID=Movie.movieID GROUP BY Movie.movieID;";
 		Statement st = conn.createStatement();
 		ResultSet rs = st.executeQuery(query);
-		System.out.println("Here are all of the tickets that have been sold for each movie.");
+		System.out.println("Here are the number of tickets that have been sold for each movie.");
 		while (rs.next()) {
 			System.out.println(
-					"ticketID: " + rs.getInt("COUNT(ticketID)") + "\nmovieTitle: " + rs.getString("movieTitle") + "\n");
+					"Number of tickets: " + rs.getInt("COUNT(ticketID)") + "\nmovieTitle: " + rs.getString("movieTitle") + "\n");
 		}
 	}
 
