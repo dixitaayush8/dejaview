@@ -1020,6 +1020,8 @@ public class DejaView {
 						dj.getStartEndTimeForAllMovies(scan, conn);
 					else if (optionChoice == 21)
 						dj.buyTicket(scan, conn);
+					else if (optionChoice == 1000)
+						dj.archiveMoviesByDate(scan, conn);
 					else if (optionChoice == 1001)
 						dj.viewUsersTickets(scan, conn);
 					else if (optionChoice == 1002)
