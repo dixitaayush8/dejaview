@@ -1,1 +1,2 @@
-1	Rakesh	Konda	rakesh.konda@sjsu.edu	password	False	0
+1	Rakesh	Konda	rakesh.konda@sjsu.edu	password	0	0
+2	Elon	Musk	elon.musk@tesla.com	tesla	1	0
