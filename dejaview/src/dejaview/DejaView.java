@@ -805,6 +805,14 @@ public class DejaView {
 		int result = ps.executeUpdate();
 		if (result == 1) {
 			System.out.println("Successfully deleted " + theaterID);
+			System.out.println("Updated Theater table: ");
+			Statement sThree = conn.createStatement();
+			ResultSet rsThree = sThree.executeQuery(query_one);
+			while (rsThree.next())
+				System.out.println("\n" + "Theater ID: " + rsThree.getInt("theaterID") + "\n" + "Cinema ID: "
+						+ rsThree.getInt("cinemaID") + "\n" + "Movie ID: " + rsThree.getInt("movieID") + "\n" + "Cinema ID: "
+						+ rsThree.getInt("cinemaID") + "\n" + "Start Time: " + rsThree.getTime("startTime") + "\n"
+						+ "End Time: " + rsThree.getTime("endTime") + "\n" + "Tickets: " + rsThree.getInt("tickets"));
 		} else {
 			System.out.println("Something went wrong");
 		}
@@ -936,7 +944,7 @@ public class DejaView {
 	}
 
 	public static void main(String[] args) throws SQLException {
-		DejaView dj = new DejaView("user", "password", "localhost", 3306, "DEJAVIEW");
+		DejaView dj = new DejaView("a", "lilwayne123", "localhost", 3306, "DEJAVIEW");
 		Connection conn = null;
 		try {
 			conn = dj.getConnection();
