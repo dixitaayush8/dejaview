@@ -548,15 +548,6 @@ public class DejaView {
 		}
 	}
 
-	public void archiveMoviesByDate(Scanner scan, Connection conn) throws SQLException {
-		String query = "call archiveMoviesBefore(?)";
-		PreparedStatement ps = conn.prepareStatement(query);
-		System.out.println("Please enter the date [YYYY:MM:DD]: ");
-		String date = scan.nextLine();
-		ps.setString(1, date);
-		ResultSet rs = ps.executeQuery();
-		System.out.println(rs.toString());
-	}
 
 	public void getStartEndTimeForAllMovies(Scanner scan, Connection conn) throws SQLException {
 		String query = "SELECT Movie.movieTitle, Theater.theaterID, Theater.startTime, Theater.endTime FROM Movie LEFT OUTER JOIN Theater USING (movieID)";
@@ -637,6 +628,7 @@ public class DejaView {
 
 	// ADMIN CHOICES AND METHODS
 
+	
 	public void adminChoices() {
 		System.out.println("");
 		System.out.println("Admin Operations");
@@ -651,6 +643,25 @@ public class DejaView {
 		System.out.println("1008. Add a theater.");
 		System.out.println("1009. Remove a theater.");
 		System.out.println("1010. Update a movie attribute.");
+	}
+	
+	public void archiveMoviesByDate(Scanner scan, Connection conn) throws SQLException {
+		String query = "call archiveMoviesBefore(?)";
+		PreparedStatement ps = conn.prepareStatement(query);
+		System.out.println("Please enter the date [YYYY:MM:DD]: ");
+		String date = scan.nextLine();
+		ps.setString(1, date);
+		ResultSet rs = ps.executeQuery();
+		System.out.println("Success, updated Movie database:");
+		String query_two = "SELECT * FROM MOVIE";
+		Statement sTwo = conn.createStatement();
+		ResultSet rsTwo = sTwo.executeQuery(query_two);
+		while (rsTwo.next())
+			System.out.println("\n" + "movieID: " + rsTwo.getInt("movieID") + "\n" + "movieTitle: "
+					+ rsTwo.getString("movieTitle") + "\n" + "genre: " + rsTwo.getString("genre") + "\n" + "actors: "
+					+ rsTwo.getString("actors") + "\n" + "director: " + rsTwo.getString("director") + "\n" + "duration: "
+					+ rsTwo.getInt("duration") + "\n" + "rating: " + rsTwo.getDouble("rating") + "\n" + "releaseYear: "
+					+ rsTwo.getInt("releaseYear") + "\n" + "updated on: " + rsTwo.getDate("updated_on"));
 	}
 
 	public void adminSeeReviews(Scanner scan, Connection conn) throws SQLException {
@@ -706,10 +717,10 @@ public class DejaView {
 				+ "Ticket.movieID=Movie.movieID GROUP BY Movie.movieID;";
 		Statement st = conn.createStatement();
 		ResultSet rs = st.executeQuery(query);
-		System.out.println("Here are all of the tickets that have been sold for each movie.");
+		System.out.println("Here are the number of tickets that have been sold for each movie.");
 		while (rs.next()) {
 			System.out.println(
-					"ticketID: " + rs.getInt("ticketID") + "\nmovieTitle: " + rs.getString("movieTitle") + "\n");
+					"Number of tickets: " + rs.getInt("COUNT(ticketID)") + "\nmovieTitle: " + rs.getString("movieTitle") + "\n");
 		}
 	}
 
@@ -724,10 +735,22 @@ public class DejaView {
 		iInput = scan.nextInt();
 		scan.nextLine();
 		ps.setInt(1, iInput);
+		String query_one = "SELECT * FROM CINEMA";
+		Statement s = conn.createStatement();
+		ResultSet rsOne = s.executeQuery(query_one);
+		while (rsOne.next())
+			System.out.println("\n" + "Cinema ID: " + rsOne.getInt("cinemaID") + "\n" + "Cinema Name: "
+					+ rsOne.getString("cinemaName"));
 		System.out.print("Please enter the cinema ID: ");
 		iInput = scan.nextInt();
 		scan.nextLine();
 		ps.setInt(2, iInput);
+		String query_two = "SELECT * FROM MOVIE";
+		Statement sTwo = conn.createStatement();
+		ResultSet rsTwo = sTwo.executeQuery(query_two);
+		while (rsTwo.next())
+			System.out.println("\n" + "Movie ID: " + rsTwo.getInt("movieID") + "\n" + "Movie Name: "
+					+ rsTwo.getString("movieTitle"));
 		System.out.print("Please enter the movie ID: ");
 		iInput = scan.nextInt();
 		scan.nextLine();
@@ -747,6 +770,7 @@ public class DejaView {
 		int result = ps.executeUpdate();
 		if (result == 1) {
 			System.out.println("Successfully added Movie to Theater");
+			seeAllShowings(conn);
 		} else {
 			System.out.println("Unable to add movie to Theater");
 		}
@@ -757,8 +781,23 @@ public class DejaView {
 	public void adminRemoveTheater(Scanner scan, Connection conn) throws SQLException {
 		String query = "DELETE FROM theater WHERE theaterID=? AND movieID=?";
 		PreparedStatement ps = conn.prepareStatement(query);
+		String query_one = "SELECT * FROM THEATER";
+		Statement s = conn.createStatement();
+		ResultSet rsOne = s.executeQuery(query_one);
+		while (rsOne.next())
+			System.out.println("\n" + "Theater ID: " + rsOne.getInt("theaterID") + "\n" + "Cinema ID: "
+					+ rsOne.getInt("cinemaID") + "\n" + "Movie ID: " + rsOne.getInt("movieID") + "\n" + "Cinema ID: "
+					+ rsOne.getInt("cinemaID") + "\n" + "Start Time: " + rsOne.getTime("startTime") + "\n"
+					+ "End Time: " + rsOne.getTime("endTime") + "\n" + "Tickets: " + rsOne.getInt("tickets"));
 		System.out.print("Enter the ID of the theater that you would like to delete: ");
 		int theaterID = scan.nextInt();
+		String query_two = "SELECT Movie.movieID, Movie.movieTitle FROM MOVIE, THEATER WHERE Movie.movieID=Theater.movieID AND Theater.theaterID= '"
+				+ theaterID + "'";
+		Statement sTwo = conn.createStatement();
+		ResultSet rsTwo = sTwo.executeQuery(query_two);
+		while (rsTwo.next())
+			System.out.println("\n" + "Movie ID: " + rsTwo.getInt("movieID") + "\n" + "Movie Name: "
+					+ rsTwo.getString("movieTitle"));
 		System.out.print("Enter the ID of the movie associated with the theater: ");
 		int movieID = scan.nextInt();
 		ps.setInt(1, theaterID);
@@ -766,6 +805,14 @@ public class DejaView {
 		int result = ps.executeUpdate();
 		if (result == 1) {
 			System.out.println("Successfully deleted " + theaterID);
+			System.out.println("Updated Theater table: ");
+			Statement sThree = conn.createStatement();
+			ResultSet rsThree = sThree.executeQuery(query_one);
+			while (rsThree.next())
+				System.out.println("\n" + "Theater ID: " + rsThree.getInt("theaterID") + "\n" + "Cinema ID: "
+						+ rsThree.getInt("cinemaID") + "\n" + "Movie ID: " + rsThree.getInt("movieID") + "\n" + "Cinema ID: "
+						+ rsThree.getInt("cinemaID") + "\n" + "Start Time: " + rsThree.getTime("startTime") + "\n"
+						+ "End Time: " + rsThree.getTime("endTime") + "\n" + "Tickets: " + rsThree.getInt("tickets"));
 		} else {
 			System.out.println("Something went wrong");
 		}
@@ -773,7 +820,15 @@ public class DejaView {
 
 	// query #29
 	public void adminUpdateMovie(Scanner scan, Connection conn) throws SQLException {
-		getMovies(conn);
+		String query_two = "SELECT * FROM MOVIE";
+		Statement sTwo = conn.createStatement();
+		ResultSet rsTwo = sTwo.executeQuery(query_two);
+		while (rsTwo.next())
+			System.out.println("\n" + "movieID: " + rsTwo.getInt("movieID") + "\n" + "movieTitle: "
+					+ rsTwo.getString("movieTitle") + "\n" + "genre: " + rsTwo.getString("genre") + "\n" + "actors: "
+					+ rsTwo.getString("actors") + "\n" + "director: " + rsTwo.getString("director") + "\n" + "duration: "
+					+ rsTwo.getInt("duration") + "\n" + "rating: " + rsTwo.getDouble("rating") + "\n" + "releaseYear: "
+					+ rsTwo.getInt("releaseYear"));
 		System.out.println("Enter the movie ID for the movie to update: ");
 		int ID = scan.nextInt();
 		scan.nextLine();
@@ -804,6 +859,16 @@ public class DejaView {
 		int result = ps.executeUpdate();
 		if (result == 1) {
 			System.out.println("Successfully updated " + ID);
+			String query_three = "SELECT * FROM MOVIE";
+			Statement sThree = conn.createStatement();
+			ResultSet rsThree = sThree.executeQuery(query_three);
+			while (rsThree.next())
+				System.out.println("\n" + "movieID: " + rsThree.getInt("movieID") + "\n" + "movieTitle: "
+						+ rsThree.getString("movieTitle") + "\n" + "genre: " + rsThree.getString("genre") + "\n" + "actors: "
+						+ rsThree.getString("actors") + "\n" + "director: " + rsThree.getString("director") + "\n" + "duration: "
+						+ rsThree.getInt("duration") + "\n" + "rating: " + rsThree.getDouble("rating") + "\n" + "releaseYear: "
+						+ rsThree.getInt("releaseYear"));
+			
 		} else {
 			System.out.println("Something went wrong");
 		}
@@ -831,9 +896,23 @@ public class DejaView {
 		System.out.println("Enter the theaterID: ");
 		int theaterID = scan.nextInt();
 		ps.setInt(1, theaterID);
+		String query_one = "SELECT * FROM CINEMA";
+		Statement s = conn.createStatement();
+		ResultSet rsOne = s.executeQuery(query_one);
+		while (rsOne.next())
+			System.out.println("\n" + "Cinema ID: " + rsOne.getInt("cinemaID") + "\n" + "Cinema Name: "
+					+ rsOne.getString("cinemaName"));
 		System.out.println("Enter the cinemaID: ");
 		int cinemaID = scan.nextInt();
 		ps.setInt(2, cinemaID);
+		String query_two = "SELECT Movie.movieID, Movie.movieTitle FROM MOVIE, THEATER WHERE Movie.movieID=Theater.movieID AND Theater.theaterID= '"
+				+ theaterID + "'";
+		Statement sTwo = conn.createStatement();
+		ResultSet rsTwo = sTwo.executeQuery(query_two);
+		while (rsTwo.next())
+			System.out.println("\n" + "Movie ID: " + rsTwo.getInt("movieID") + "\n" + "Movie Name: "
+					+ rsTwo.getString("movieTitle"));
+		System.out.print("Enter the ID of the movie associated with the theater (CANNOT be any Movie ID from above): ");
 		System.out.println("Enter the movieID: ");
 		int movieID = scan.nextInt();
 		ps.setInt(3, movieID);
