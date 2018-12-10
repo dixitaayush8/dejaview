@@ -3,3 +3,13 @@
 3	The Post	Biography,Drama,History	Meryl Streep,Tom Hanks	Steven Spielberg	116	7	2017	2017-11-16
 4	12 Strong	Action,Drama,History	Chris Hemsworth, Michael Shannon	Nicolai Fuglsig	130	7	2018	2018-11-16
 5	Maze Runner: The Death Cure	Action,Sci-Fi,Thriller	Dylan O'Brien, Ki Hong Lee	Wes Ball	143	6	2018	2018-11-16
+6	Monsters Inc.	Fantasy,Adventure	John Goodman, Steve Buscemi	Pete Docter	92	8	2001	2018-11-16
+7	Home Alone	Adventure,Comedy	Macaulay Culkin, Joe Pesci	Chris Columbus	103	8	1990	2018-12-01
+8	Monsters University	Fantasy,Adventure	Billy Crystal, John Goodman	Dan Scanlon	110	9	2013	2018-12-01
+9	The Incredibles	Action	Sophia Bush,Bob Odenkirk	Brad Bird	115	10	2004	2018-12-01
+10	The Incredibles 2	Action	Sophia Bush,Bob Odenkirk	Brad Bird	125	9	2018	2018-12-02
+11	Toy Story	Fantasy, Adventure	Tim Allen,Tom Hanks	John Lasseter	81	9	1995	2018-11-30
+12	Toy Story 2	Fantasy, Adventure	Tim Allen,Tom Hanks	John Lasseter	95	7	1999	2018-11-30
+13	Toy Story 3	Fantasy, Adventure	Tim Allen,Tom Hanks	Lee Unkrich	108	8	2010	2018-11-30
+14	Forrest Gump	Drama,Comedy-Drama	Tom Hanks,Gary Sinise	Robert Zemeckis	142	10	1994	2018-11-30
+15	Fight Club	Drama,Action	Brad Pitt,Edward Norton	David Fincher	151	9	1999	2018-12-01
