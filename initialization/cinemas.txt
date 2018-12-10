@@ -1,3 +1,5 @@
 1	AMC
 2	Regal Cinemas
 3	Century
+4	Starlight	
+5	IMAX
